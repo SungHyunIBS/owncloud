@@ -60,7 +60,7 @@
 ```
 services:
   owncloud:
-    image: owncloud/server:latest
+    image: owncloud/server:10.14
     container_name: owncloud_server
     restart: always
     ports:
@@ -83,6 +83,7 @@ services:
       - OWNCLOUD_REDIS_HOST=redis
       - PHP_UPLOAD_MAX_FILESIZE=16G
       - PHP_POST_MAX_SIZE=16G
+      - TZ=Asia/Seoul
     healthcheck:
       test: ["CMD", "/usr/bin/healthcheck"]
       interval: 30s
@@ -92,7 +93,7 @@ services:
       - ./oc-data:/mnt/data
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:10.11
     container_name: owncloud_mariadb
     restart: always
     environment:
@@ -101,7 +102,8 @@ services:
       - MYSQL_PASSWORD=owncloud
       - MYSQL_DATABASE=owncloud
       - MARIADB_AUTO_UPGRADE=1
-    command: ["--max-allowed-packet=512M", "--innodb-log-file-size=64M"]
+      - TZ=Asia/Seoul
+    command: ["--max-allowed-packet=128M", "--innodb-log-file-size=64M"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-u", "root", "--password=owncloud"]
       interval: 10s
@@ -111,9 +113,11 @@ services:
       - ./mysql-data:/var/lib/mysql
 
   redis:
-    image: redis:latest
+    image: redis:6
     container_name: owncloud_redis
     restart: always
+    environment:
+      - TZ=Asia/Seoul
     command: ["--databases", "1"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
